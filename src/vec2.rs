@@ -29,6 +29,14 @@ impl Vec2<usize> {
         let Self { x: maxx, y: maxy } = max.into();
         Self::new(self.x.clamp(minx, maxx), self.y.clamp(miny, maxy))
     }
+
+    pub fn saturating_sub(&self, other: impl Into<Self>) -> Self {
+        let Self { x, y } = other.into();
+        Self {
+            x: self.x.saturating_sub(x),
+            y: self.y.saturating_sub(y),
+        }
+    }
 }
 
 impl<T> From<(T, T)> for Vec2<T> {

@@ -63,7 +63,7 @@ fn start() -> Result<()> {
 
         match key.code {
             KeyCode::Up => {
-                board.set_selected(board.selected() - (0, 1).into());
+                board.set_selected(board.selected().saturating_sub((0, 1)));
             }
             KeyCode::Right => {
                 board.set_selected(board.selected() + (1, 0).into());
@@ -72,7 +72,7 @@ fn start() -> Result<()> {
                 board.set_selected(board.selected() + (0, 1).into());
             }
             KeyCode::Left => {
-                board.set_selected(board.selected() - (1, 0).into());
+                board.set_selected(board.selected().saturating_sub((1, 0)));
             }
             KeyCode::Enter => {
                 if let Err(e) = board.play() {

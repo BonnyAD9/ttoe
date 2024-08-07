@@ -52,7 +52,8 @@ impl Board {
     }
 
     pub fn set_selected(&mut self, selected: Vec2) {
-        self.selected = selected.clamp((0, 0), (self.width, self.height));
+        self.selected =
+            selected.clamp((0, 0), (self.width - 1, self.height - 1));
     }
 
     pub fn play(&mut self) -> Result<()> {
