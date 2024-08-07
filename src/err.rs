@@ -8,4 +8,6 @@ pub enum Error {
     AlreadyPopulated,
     #[error("Cant't place at the given position. It is outside of bounds.")]
     OutOfBounds,
+    #[error(transparent)]
+    Termal(#[from] termal::error::Error),
 }

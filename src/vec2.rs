@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Index, IndexMut, Neg};
+use std::ops::{Add, AddAssign, Index, IndexMut, Neg, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2<T = usize> {
@@ -19,6 +19,12 @@ impl Vec2<usize> {
             x: self.x.wrapping_add_signed(x),
             y: self.y.wrapping_add_signed(y),
         }
+    }
+
+    pub fn clamp(&self, min: impl Into<Self>, max: impl Into<Self>) -> Self {
+        let Self { x: minx, y: miny } = min.into();
+        let Self { x: maxx, y: maxy } = max.into();
+        Self::new(self.x.clamp(minx, maxx), self.y.clamp(miny, maxy))
     }
 }
 
@@ -68,6 +74,21 @@ impl<L, R> AddAssign<Vec2<R>> for Vec2<L> where L: AddAssign<R> {
     fn add_assign(&mut self, rhs: Vec2<R>) {
         self.x += rhs.x;
         self.y += rhs.y;
+    }
+}
+
+impl<L, R> Sub<Vec2<R>> for Vec2<L> where L: Sub<R> {
+    type Output = Vec2<L::Output>;
+
+    fn sub(self, rhs: Vec2<R>) -> Self::Output {
+        Vec2::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
+impl<L, R> SubAssign<Vec2<R>> for Vec2<L> where L: SubAssign<R> {
+    fn sub_assign(&mut self, rhs: Vec2<R>) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
 

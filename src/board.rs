@@ -8,6 +8,7 @@ pub struct Board {
     height: usize,
     on_turn: Suit,
     win_length: usize,
+    selected: Vec2,
 }
 
 impl Board {
@@ -18,8 +19,9 @@ impl Board {
             board,
             width,
             height,
-            on_turn: Suit::Circle,
-            win_length: 5
+            on_turn: Suit::Cross,
+            win_length: 5,
+            selected: ((width - 1) / 2, (height - 1) / 2).into()
         }
     }
 
@@ -35,7 +37,16 @@ impl Board {
         self.on_turn
     }
 
-    pub fn play(&mut self, x: usize, y: usize) -> Result<()> {
+    pub fn selected(&self) -> Vec2 {
+        self.selected
+    }
+
+    pub fn set_selected(&mut self, selected: Vec2) {
+        self.selected = selected.clamp((0, 0), (self.width, self.height));
+    }
+
+    pub fn play(&mut self) -> Result<()> {
+        let Vec2 { x, y } = self.selected;
         if x > self.width() || y > self.height() {
             return Err(Error::OutOfBounds);
         }
@@ -60,23 +71,32 @@ impl Board {
                     continue;
                 }
 
-                if y + self.win_length < self.height {
-                    if x > self.win_length && self.is_win((x, y), (-1, 1)) {
+                if y + self.win_length <= self.height {
+                    if x >= self.win_length && self.is_win((x, y), (-1, 1)) {
                         return Some(suit);
                     }
                     if self.is_win((x, y), (0, 1)) {
                         return Some(suit);
                     }
-                    if x + self.win_length < self.width && self.is_win((x, y), (1, 1)) {
+                    if x + self.win_length <= self.width && self.is_win((x, y), (1, 1)) {
                         return Some(suit);
                     }
-                } else if x + self.win_length < self.width && self.is_win((x, y), (1, 0)) {
+                }
+                if x + self.win_length <= self.width && self.is_win((x, y), (1, 0)) {
                     return Some(suit);
                 }
             }
         }
 
         (!draw).then(|| Suit::None)
+    }
+
+    pub fn reset(&mut self) {
+        for v in &mut self.board {
+            *v = Suit::None;
+        }
+        self.on_turn = Suit::Cross;
+        self.selected = ((self.width - 1) / 2, (self.height - 1) / 2).into();
     }
 
     fn is_win(&self, pos: impl Into<Vec2<usize>>, dir: impl Into<Vec2<isize>>) -> bool {
