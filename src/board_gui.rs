@@ -1,9 +1,12 @@
 use termal::{codes, formatc};
 
-use crate::{board::Board, spot::Suit, vec2::Vec2};
+use crate::{board::Board, suit::Suit};
 
 impl Board {
-    pub fn draw<F>(&self, out: &mut String, move_to: F) where F: Fn(&mut String, usize, usize) {
+    pub fn draw<F>(&self, out: &mut String, move_to: F)
+    where
+        F: Fn(&mut String, usize, usize),
+    {
         fn draw_suit(out: &mut String, suit: Suit) {
             match suit {
                 Suit::None => *out += " ",
@@ -52,7 +55,7 @@ impl Board {
         draw_suit(out, self[self.selected()]);
         *out += &format!(" {color}|");
         move_to(out, x, y + 2);
-        *out += &format!("+---+");
+        *out += "+---+";
 
         move_to(out, 0, self.height() * 2 + 1);
     }

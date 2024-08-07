@@ -1,14 +1,23 @@
-use std::{io::{stdout, Write}, process::ExitCode};
+use std::{
+    io::{stdout, Write},
+    process::ExitCode,
+};
 
 use board::Board;
 use err::Result;
-use spot::Suit;
-use termal::{codes, eprintcln, formatc, printc, printcln, raw::{self, events::{Event, KeyCode}}};
+use suit::Suit;
+use termal::{
+    codes, eprintcln, formatc,
+    raw::{
+        self,
+        events::{Event, KeyCode},
+    },
+};
 
 mod board;
-mod spot;
 mod board_gui;
 mod err;
+mod suit;
 mod vec2;
 
 fn main() -> ExitCode {

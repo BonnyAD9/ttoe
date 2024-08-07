@@ -13,7 +13,10 @@ impl<T> Vec2<T> {
 }
 
 impl Vec2<usize> {
-    pub fn wrapping_add_signed(&mut self, other: impl Into<Vec2<isize>>) -> Self {
+    pub fn wrapping_add_signed(
+        &mut self,
+        other: impl Into<Vec2<isize>>,
+    ) -> Self {
         let Vec2 { x, y } = other.into();
         Self {
             x: self.x.wrapping_add_signed(x),
@@ -62,7 +65,10 @@ impl<T> IndexMut<usize> for Vec2<T> {
     }
 }
 
-impl<L, R> Add<Vec2<R>> for Vec2<L> where L: Add<R> {
+impl<L, R> Add<Vec2<R>> for Vec2<L>
+where
+    L: Add<R>,
+{
     type Output = Vec2<L::Output>;
 
     fn add(self, rhs: Vec2<R>) -> Self::Output {
@@ -70,14 +76,20 @@ impl<L, R> Add<Vec2<R>> for Vec2<L> where L: Add<R> {
     }
 }
 
-impl<L, R> AddAssign<Vec2<R>> for Vec2<L> where L: AddAssign<R> {
+impl<L, R> AddAssign<Vec2<R>> for Vec2<L>
+where
+    L: AddAssign<R>,
+{
     fn add_assign(&mut self, rhs: Vec2<R>) {
         self.x += rhs.x;
         self.y += rhs.y;
     }
 }
 
-impl<L, R> Sub<Vec2<R>> for Vec2<L> where L: Sub<R> {
+impl<L, R> Sub<Vec2<R>> for Vec2<L>
+where
+    L: Sub<R>,
+{
     type Output = Vec2<L::Output>;
 
     fn sub(self, rhs: Vec2<R>) -> Self::Output {
@@ -85,14 +97,20 @@ impl<L, R> Sub<Vec2<R>> for Vec2<L> where L: Sub<R> {
     }
 }
 
-impl<L, R> SubAssign<Vec2<R>> for Vec2<L> where L: SubAssign<R> {
+impl<L, R> SubAssign<Vec2<R>> for Vec2<L>
+where
+    L: SubAssign<R>,
+{
     fn sub_assign(&mut self, rhs: Vec2<R>) {
         self.x -= rhs.x;
         self.y -= rhs.y;
     }
 }
 
-impl<T> Neg for Vec2<T> where T: Neg {
+impl<T> Neg for Vec2<T>
+where
+    T: Neg,
+{
     type Output = Vec2<T::Output>;
 
     fn neg(self) -> Self::Output {

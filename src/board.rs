@@ -1,6 +1,10 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{err::{Error, Result}, spot::Suit, vec2::Vec2};
+use crate::{
+    err::{Error, Result},
+    suit::Suit,
+    vec2::Vec2,
+};
 
 pub struct Board {
     board: Vec<Suit>,
@@ -21,7 +25,7 @@ impl Board {
             height,
             on_turn: Suit::Cross,
             win_length: 5,
-            selected: ((width - 1) / 2, (height - 1) / 2).into()
+            selected: ((width - 1) / 2, (height - 1) / 2).into(),
         }
     }
 
@@ -78,17 +82,21 @@ impl Board {
                     if self.is_win((x, y), (0, 1)) {
                         return Some(suit);
                     }
-                    if x + self.win_length <= self.width && self.is_win((x, y), (1, 1)) {
+                    if x + self.win_length <= self.width
+                        && self.is_win((x, y), (1, 1))
+                    {
                         return Some(suit);
                     }
                 }
-                if x + self.win_length <= self.width && self.is_win((x, y), (1, 0)) {
+                if x + self.win_length <= self.width
+                    && self.is_win((x, y), (1, 0))
+                {
                     return Some(suit);
                 }
             }
         }
 
-        (!draw).then(|| Suit::None)
+        (!draw).then_some(Suit::None)
     }
 
     pub fn reset(&mut self) {
@@ -99,7 +107,11 @@ impl Board {
         self.selected = ((self.width - 1) / 2, (self.height - 1) / 2).into();
     }
 
-    fn is_win(&self, pos: impl Into<Vec2<usize>>, dir: impl Into<Vec2<isize>>) -> bool {
+    fn is_win(
+        &self,
+        pos: impl Into<Vec2<usize>>,
+        dir: impl Into<Vec2<isize>>,
+    ) -> bool {
         let mut pos = pos.into();
         let dir = dir.into();
         let suit = self[pos];
@@ -109,27 +121,39 @@ impl Board {
                 return false;
             }
         }
-        return true;
+        true
     }
 }
 
-impl<T> Index<T> for Board where T: Into<Vec2> {
+impl<T> Index<T> for Board
+where
+    T: Into<Vec2>,
+{
     type Output = Suit;
 
     fn index(&self, idx: T) -> &Self::Output {
         let Vec2 { x, y } = idx.into();
         if x > self.width || y > self.height {
-            panic!("Index ({x}, {y}) out of range of ({}, {})", self.width, self.height);
+            panic!(
+                "Index ({x}, {y}) out of range of ({}, {})",
+                self.width, self.height
+            );
         }
         &self.board[y * self.width + x]
     }
 }
 
-impl<T> IndexMut<T> for Board where T: Into<Vec2> {
+impl<T> IndexMut<T> for Board
+where
+    T: Into<Vec2>,
+{
     fn index_mut(&mut self, idx: T) -> &mut Self::Output {
         let Vec2 { x, y } = idx.into();
         if x > self.width || y > self.height {
-            panic!("Index ({x}, {y}) out of range of ({}, {})", self.width, self.height);
+            panic!(
+                "Index ({x}, {y}) out of range of ({}, {})",
+                self.width, self.height
+            );
         }
         &mut self.board[y * self.width + x]
     }
