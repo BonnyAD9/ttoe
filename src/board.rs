@@ -13,6 +13,7 @@ pub struct Board {
     on_turn: Suit,
     win_length: usize,
     selected: Vec2,
+    last: Vec2,
 }
 
 impl Board {
@@ -26,6 +27,7 @@ impl Board {
             on_turn: Suit::Cross,
             win_length: 5,
             selected: ((width - 1) / 2, (height - 1) / 2).into(),
+            last: (0, 0).into()
         }
     }
 
@@ -41,6 +43,10 @@ impl Board {
         self.on_turn
     }
 
+    pub fn inspect_mode(&mut self) {
+        self.on_turn = Suit::None
+    }
+
     pub fn selected(&self) -> Vec2 {
         self.selected
     }
@@ -50,6 +56,10 @@ impl Board {
     }
 
     pub fn play(&mut self) -> Result<()> {
+        if self.on_turn == Suit::None {
+            return Ok(());
+        }
+
         let Vec2 { x, y } = self.selected;
         if x > self.width() || y > self.height() {
             return Err(Error::OutOfBounds);
@@ -59,6 +69,7 @@ impl Board {
             return Err(Error::AlreadyPopulated);
         }
 
+        self.last = (x, y).into();
         self[(x, y)] = self.on_turn;
         self.on_turn = self.on_turn.oposite();
 
@@ -105,6 +116,14 @@ impl Board {
         }
         self.on_turn = Suit::Cross;
         self.selected = ((self.width - 1) / 2, (self.height - 1) / 2).into();
+    }
+
+    pub fn undo(&mut self) {
+        let last = self.last;
+        if self[last] != Suit::None {
+            self[last] = Suit::None;
+            self.on_turn = self.on_turn.oposite();
+        }
     }
 
     fn is_win(

@@ -24,7 +24,7 @@ fn main() -> ExitCode {
     match start() {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            print!("{}", codes::DISABLE_ALTERNATIVE_BUFFER);
+            print!("{}{}", codes::DISABLE_ALTERNATIVE_BUFFER, codes::SHOW_CURSOR);
             eprintcln!("{'r}error: {e}");
             _ = raw::disable_raw_mode();
             ExitCode::FAILURE
@@ -33,28 +33,17 @@ fn main() -> ExitCode {
 }
 
 fn start() -> Result<()> {
-    /*printcln!("{'gr}┌───┬───┬───┐");
-    printcln!("│ {'b}X {'gr}│ {'b}X {'gr}│ {'b}X {'gr}│");
-    printcln!("├───╆━━━╅───┤");
-    printcln!("│ {'r}O {'gr}┃{'w}[{'r}O{'w}]{'gr}┃ {'r}O {'gr}│");
-    printcln!("└───┺━━━┹───┘{'_}");
-    printcln!("{'gr}+---+---+---+");
-    printcln!("| {'b}X {'gr}| {'b}X {'gr}| {'b}X {'gr}|");
-    printcln!("+---{'w}+---+{'gr}---+");
-    printcln!("| {'r}O {'w}| {'r}O {'w}| {'r}O {'gr}|");
-    printcln!("+---{'w}+---+{'gr}---+{'_}");*/
-
     raw::enable_raw_mode()?;
 
     let mut board = Board::new(20, 20);
     let mut terminal = raw::Terminal::new();
     let mut out = String::new();
     let mut msg = String::new();
-    let mut endgame = false;
 
     out += codes::ENABLE_ALTERNATIVE_BUFFER;
     out += codes::ERASE_ALL;
     out += codes::ERASE_SCREEN;
+    out += codes::HIDE_CURSOR;
     print!("{}", out);
 
     loop {
@@ -66,13 +55,6 @@ fn start() -> Result<()> {
 
         let Event::KeyPress(key) = terminal.read()? else {
             continue;
-        };
-
-        if key.code == KeyCode::Char('q') {
-            break;
-        } else if endgame {
-            endgame = false;
-            board.reset();
         };
 
         match key.code {
@@ -94,26 +76,38 @@ fn start() -> Result<()> {
                 }
                 match board.check_win() {
                     None => {
-                        msg += &formatc!("{out}{'_}Draw!");
-                        endgame = true;
+                        msg += &formatc!("{'_}Draw!");
+                        board.inspect_mode();
                     }
                     Some(Suit::Circle) => {
-                        msg += &formatc!("{out}{'r}O {'_}Wins!\r");
-                        endgame = true;
+                        msg += &formatc!("{'r}O {'_}Wins!\r");
+                        board.inspect_mode();
                     }
                     Some(Suit::Cross) => {
-                        msg += &formatc!("{out}{'b}X {'_}Wins!\r");
-                        endgame = true;
+                        msg += &formatc!("{'b}X {'_}Wins!\r");
+                        board.inspect_mode();
                     }
                     _ => {}
                 }
+            }
+            KeyCode::Char('u') => {
+                board.undo();
+            }
+            KeyCode::Char('r') => {
+                board.reset();
+            }
+            KeyCode::Char('q') => {
+                break;
+            }
+            KeyCode::Char('h') => {
+                msg += &formatc!("{'_}[↑→↓←]move [Enter]play [q]quit [r]restart [u]undo [h]help");
             }
             _ => {}
         }
     }
 
     raw::disable_raw_mode()?;
-    print!("{}", codes::DISABLE_ALTERNATIVE_BUFFER);
+    print!("{}{}", codes::DISABLE_ALTERNATIVE_BUFFER, codes::SHOW_CURSOR);
 
     Ok(())
 }
