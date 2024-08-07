@@ -27,7 +27,7 @@ impl Board {
             on_turn: Suit::Cross,
             win_length: 5,
             selected: ((width - 1) / 2, (height - 1) / 2).into(),
-            last: (0, 0).into()
+            last: (0, 0).into(),
         }
     }
 

@@ -24,7 +24,11 @@ fn main() -> ExitCode {
     match start() {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            print!("{}{}", codes::DISABLE_ALTERNATIVE_BUFFER, codes::SHOW_CURSOR);
+            print!(
+                "{}{}",
+                codes::DISABLE_ALTERNATIVE_BUFFER,
+                codes::SHOW_CURSOR
+            );
             eprintcln!("{'r}error: {e}");
             _ = raw::disable_raw_mode();
             ExitCode::FAILURE
@@ -100,14 +104,21 @@ fn start() -> Result<()> {
                 break;
             }
             KeyCode::Char('h') => {
-                msg += &formatc!("{'_}[↑→↓←]move [Enter]play [q]quit [r]restart [u]undo [h]help");
+                msg += &formatc!(
+                    "{'_}[↑→↓←]move [Enter]play [q]quit [r]restart [u]undo \
+                    [h]help"
+                );
             }
             _ => {}
         }
     }
 
     raw::disable_raw_mode()?;
-    print!("{}{}", codes::DISABLE_ALTERNATIVE_BUFFER, codes::SHOW_CURSOR);
+    print!(
+        "{}{}",
+        codes::DISABLE_ALTERNATIVE_BUFFER,
+        codes::SHOW_CURSOR
+    );
 
     Ok(())
 }
