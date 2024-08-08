@@ -1,4 +1,10 @@
-use std::ops::{Add, AddAssign, Index, IndexMut, Neg, Sub, SubAssign};
+use std::{
+    cmp::Ordering,
+    fmt::Display,
+    ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Neg, Sub, SubAssign},
+};
+
+use crate::vec2_range::Vec2Range;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Vec2<T = usize> {
@@ -36,6 +42,31 @@ impl Vec2<usize> {
             x: self.x.saturating_sub(x),
             y: self.y.saturating_sub(y),
         }
+    }
+
+    pub fn to(self, other: Vec2) -> Vec2Range<usize> {
+        Vec2Range::new(self, other)
+    }
+}
+
+impl<T> Vec2<T>
+where
+    T: Mul<T>,
+{
+    pub fn prod(self) -> T::Output {
+        self.x * self.y
+    }
+}
+
+impl<T> Vec2<T> {
+    pub fn gt_or<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x.partial_cmp(&x) == Some(Ordering::Greater)
+            || self.y.partial_cmp(&y) == Some(Ordering::Greater)
     }
 }
 
@@ -123,5 +154,26 @@ where
 
     fn neg(self) -> Self::Output {
         Vec2::new(-self.x, -self.y)
+    }
+}
+
+impl<L, R> Div<R> for Vec2<L>
+where
+    L: Div<R>,
+    R: Copy,
+{
+    type Output = Vec2<L::Output>;
+
+    fn div(self, rhs: R) -> Self::Output {
+        Vec2::new(self.x / rhs, self.y / rhs)
+    }
+}
+
+impl<T> Display for Vec2<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}, {}]", self.x, self.y)
     }
 }

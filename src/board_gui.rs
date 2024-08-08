@@ -16,16 +16,16 @@ impl Board {
         }
 
         *out += &formatc!("{'_ gr}");
-        for y in 0..self.height() {
+        for y in 0..self.size().y {
             move_to(out, 0, y * 2);
 
-            for _ in 0..self.width() {
+            for _ in 0..self.size().x {
                 *out += "+---";
             }
             *out += "+";
             move_to(out, 0, y * 2 + 1);
 
-            for x in 0..self.width() {
+            for x in 0..self.size().x {
                 *out += "| ";
                 draw_suit(out, self[(x, y)]);
                 *out += &formatc!(" {'gr}");
@@ -33,8 +33,8 @@ impl Board {
             *out += "|";
         }
 
-        move_to(out, 0, self.height() * 2);
-        for _ in 0..self.width() {
+        move_to(out, 0, self.size().y * 2);
+        for _ in 0..self.size().x {
             *out += "+---";
         }
         *out += "+";
@@ -57,6 +57,6 @@ impl Board {
         move_to(out, x, y + 2);
         *out += "+---+";
 
-        move_to(out, 0, self.height() * 2 + 1);
+        move_to(out, 0, self.size().y * 2 + 1);
     }
 }

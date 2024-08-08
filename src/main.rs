@@ -19,6 +19,7 @@ mod board_gui;
 mod err;
 mod suit;
 mod vec2;
+mod vec2_range;
 
 fn main() -> ExitCode {
     match start() {
@@ -39,7 +40,7 @@ fn main() -> ExitCode {
 fn start() -> Result<()> {
     raw::enable_raw_mode()?;
 
-    let mut board = Board::new(20, 20);
+    let mut board = Board::new((20, 20));
     let mut terminal = raw::Terminal::new();
     let mut out = String::new();
     let mut msg = String::new();
