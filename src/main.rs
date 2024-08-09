@@ -8,10 +8,10 @@ use board::Board;
 use err::Result;
 use suit::Suit;
 use termal::{
-    codes, eprintcln, formatc,
+    codes, eprintcln, formatc, printc,
     raw::{
         self,
-        events::{Event, KeyCode},
+        events::{Event, KeyCode, Modifiers},
     },
 };
 use vec2::Vec2;
@@ -47,6 +47,9 @@ fn start() -> Result<()> {
     let mut out = String::new();
     let mut msg = String::new();
 
+    let default_msg = formatc!("{'gr}Press [h] to show help.");
+    let mut persistant_msg = String::new();
+
     out += codes::ENABLE_ALTERNATIVE_BUFFER;
     out += codes::ERASE_ALL;
     out += codes::ERASE_SCREEN;
@@ -68,16 +71,26 @@ fn start() -> Result<()> {
         size = new_size;
 
         if redraw {
+            let msg = [msg.as_str(), &persistant_msg]
+                .into_iter()
+                .find(|a| !a.is_empty())
+                .unwrap_or(&default_msg);
             board.draw(
                 &mut out,
                 |s, Vec2 { x, y }| *s += &termal::move_to!(x + 1, y + 1),
                 size - (0, 1).into(),
+                msg,
             );
-            print!("{out}{}{msg}", codes::ERASE_TO_END);
+            printc!("{out}");
             _ = stdout().flush();
             redraw = false;
         }
         msg.clear();
+        if !persistant_msg.is_empty()
+            && !persistant_msg.starts_with(codes::ESC)
+        {
+            persistant_msg.insert_str(0, codes::GRAY_FG);
+        }
 
         if !terminal.has_buffered_input()
             && !raw::wait_for_stdin(Duration::from_millis(100))?
@@ -90,33 +103,36 @@ fn start() -> Result<()> {
         };
 
         match key.code {
-            KeyCode::Up => {
+            KeyCode::Up | KeyCode::Char('w') => {
                 board.set_selected(board.selected().saturating_sub((0, 1)));
             }
-            KeyCode::Right => {
-                board.set_selected(board.selected() + (1, 0).into());
-            }
-            KeyCode::Down => {
-                board.set_selected(board.selected() + (0, 1).into());
-            }
-            KeyCode::Left => {
+            KeyCode::Left | KeyCode::Char('a') => {
                 board.set_selected(board.selected().saturating_sub((1, 0)));
             }
-            KeyCode::Enter => {
+            KeyCode::Down | KeyCode::Char('s') => {
+                board.set_selected(board.selected() + (0, 1).into());
+            }
+            KeyCode::Right | KeyCode::Char('d') => {
+                board.set_selected(board.selected() + (1, 0).into());
+            }
+            KeyCode::Enter | KeyCode::Space | KeyCode::Char('0') => {
                 if let Err(e) = board.play() {
                     msg += &formatc!("{'r}error: {'_}{e}");
                 }
                 match board.check_win() {
                     None => {
-                        msg += &formatc!("{'_}Draw!");
+                        persistant_msg.clear();
+                        persistant_msg += &formatc!("{'_}Draw!");
                         board.inspect_mode();
                     }
                     Some(Suit::Circle) => {
-                        msg += &formatc!("{'r}O {'_}Wins!\r");
+                        persistant_msg.clear();
+                        persistant_msg += &formatc!("{'r}O {'_}Wins!\r");
                         board.inspect_mode();
                     }
                     Some(Suit::Cross) => {
-                        msg += &formatc!("{'b}X {'_}Wins!\r");
+                        persistant_msg.clear();
+                        persistant_msg += &formatc!("{'b}X {'_}Wins!\r");
                         board.inspect_mode();
                     }
                     _ => {}
@@ -126,16 +142,22 @@ fn start() -> Result<()> {
                 board.undo();
             }
             KeyCode::Char('r') => {
+                persistant_msg.clear();
                 board.reset();
             }
             KeyCode::Char('q') => {
                 break;
             }
+            KeyCode::Char('c') => {
+                if key.modifiers.contains(Modifiers::CONTROL) {
+                    break;
+                }
+                persistant_msg.clear();
+            }
             KeyCode::Char('h') => {
-                msg += &formatc!(
-                    "{'_}[↑→↓←]move [Enter]play [q]quit [r]restart [u]undo \
-                    [h]help"
-                );
+                persistant_msg.clear();
+                persistant_msg += "[wasd/↑←↓→]move [Enter/Space/0]play \
+                [q]quit [r]restart [u]undo [h]help";
             }
             _ => {
                 continue;
