@@ -13,6 +13,7 @@ pub struct Board {
     win_length: usize,
     selected: Vec2,
     last: Vec2,
+    win_pos: Option<(Vec2, Vec2<isize>)>,
 }
 
 impl Board {
@@ -27,6 +28,7 @@ impl Board {
             win_length: 5,
             selected: (size - (1, 1).into()) / 2,
             last: (0, 0).into(),
+            win_pos: None,
         }
     }
 
@@ -50,6 +52,14 @@ impl Board {
         self.selected = selected.clamp((0, 0), self.size - (1, 1).into());
     }
 
+    pub fn win_pos(&self) -> Option<(Vec2, Vec2<isize>)> {
+        self.win_pos
+    }
+
+    pub fn win_len(&self) -> usize {
+        self.win_length
+    }
+
     pub fn play(&mut self) -> Result<()> {
         if self.on_turn == Suit::None {
             return Ok(());
@@ -68,7 +78,7 @@ impl Board {
         Ok(())
     }
 
-    pub fn check_win(&self) -> Option<Suit> {
+    pub fn check_win(&mut self) -> Option<Suit> {
         let mut draw = true;
         for pos in Vec2::new(0, 0).to(self.size) {
             let suit = self[pos];
@@ -106,6 +116,7 @@ impl Board {
         }
         self.on_turn = Suit::Cross;
         self.selected = (self.size - (1, 1).into()) / 2;
+        self.win_pos = None;
     }
 
     pub fn undo(&mut self) {
@@ -117,11 +128,12 @@ impl Board {
     }
 
     fn is_win(
-        &self,
+        &mut self,
         pos: impl Into<Vec2<usize>>,
         dir: impl Into<Vec2<isize>>,
     ) -> bool {
         let mut pos = pos.into();
+        let pos1 = pos;
         let dir = dir.into();
         let suit = self[pos];
         for _ in 0..self.win_length - 1 {
@@ -130,6 +142,7 @@ impl Board {
                 return false;
             }
         }
+        self.win_pos = Some((pos1, dir));
         true
     }
 }

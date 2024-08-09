@@ -35,6 +35,10 @@ impl<T> Vec2<T> {
         let Vec2 { x, y } = rhs.into();
         Vec2::new(self.x * x, self.y * y)
     }
+
+    pub fn tuple(self) -> (T, T) {
+        (self.x, self.y)
+    }
 }
 
 impl Vec2<usize> {

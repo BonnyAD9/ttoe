@@ -54,21 +54,61 @@ impl Board {
         }
         *out += "+";
 
+        if let Some((pos, dir)) = self.win_pos() {
+            let (color, _) = Self::get_color_char(self[pos]);
+
+            match dir.tuple() {
+                (-1, 1) => {
+                    let mut pos = pos;
+                    for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (0, 2).into());
+                        *out += &format!("{color}/");
+                        pos = pos.wrapping_add_signed(dir);
+                    }
+                }
+                (1, 1) => {
+                    let mut pos = pos;
+                    for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (4, 2).into());
+                        *out += &format!("{color}\\");
+                        pos = pos.wrapping_add_signed(dir);
+                    }
+                }
+                (0, 1) => {
+                    let mut pos = pos;
+                    for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (2, 2).into());
+                        *out += &format!("{color}|");
+                        pos = pos.wrapping_add_signed(dir);
+                    }
+                }
+                (1, 0) => {
+                    let mut pos = pos;
+                    move_to(out, pos.cmul((4, 2)) + (1, 1).into());
+                    *out += &format!("{color}-");
+                    for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                        *out += &format!("{color}---");
+                        pos = pos.wrapping_add_signed(dir);
+                    }
+                    move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                    *out += &format!("{color}-");
+                }
+                _ => {}
+            }
+        }
+
         let x = self.selected().x * 4;
         let y = self.selected().y * 2;
 
         move_to(out, (x, y).into());
-        let (color, chr) = match self.on_turn() {
-            Suit::Circle => (codes::RED_FG, 'o'),
-            Suit::Cross => (codes::BLUE_FG, 'x'),
-            Suit::None => (codes::WHITE_FG, '+'),
-        };
+        let (color, chr) = Self::get_color_char(self.on_turn());
 
         *out += &format!("{color}{chr}---{chr}");
         move_to(out, (x, y + 1).into());
-        *out += "| ";
-        Self::draw_suit(out, self[self.selected()]);
-        *out += &format!(" {color}|");
+        *out += "|";
+        move_to(out, (x + 4, y + 1).into());
+        *out += "|";
         move_to(out, (x, y + 2).into());
         *out += &format!("{chr}---{chr}");
     }
@@ -83,5 +123,13 @@ impl Board {
 
     fn center(available: impl Into<Vec2>, required: impl Into<Vec2>) -> Vec2 {
         available.into().saturating_sub(required.into()) / 2
+    }
+
+    fn get_color_char(suit: Suit) -> (&'static str, char) {
+        match suit {
+            Suit::Circle => (codes::RED_FG, 'o'),
+            Suit::Cross => (codes::BLUE_FG, 'x'),
+            Suit::None => (codes::WHITE_FG, '+'),
+        }
     }
 }
