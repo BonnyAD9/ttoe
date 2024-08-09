@@ -16,6 +16,25 @@ impl<T> Vec2<T> {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
+
+    pub fn gt_or<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x.partial_cmp(&x) == Some(Ordering::Greater)
+            || self.y.partial_cmp(&y) == Some(Ordering::Greater)
+    }
+
+    pub fn cmul<I, R>(self, rhs: I) -> Vec2<T::Output>
+    where
+        T: Mul<R>,
+        I: Into<Vec2<R>>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        Vec2::new(self.x * x, self.y * y)
+    }
 }
 
 impl Vec2<usize> {
@@ -55,18 +74,6 @@ where
 {
     pub fn prod(self) -> T::Output {
         self.x * self.y
-    }
-}
-
-impl<T> Vec2<T> {
-    pub fn gt_or<I, R>(&self, rhs: I) -> bool
-    where
-        I: Into<Vec2<R>>,
-        T: PartialOrd<R>,
-    {
-        let Vec2 { x, y } = rhs.into();
-        self.x.partial_cmp(&x) == Some(Ordering::Greater)
-            || self.y.partial_cmp(&y) == Some(Ordering::Greater)
     }
 }
 

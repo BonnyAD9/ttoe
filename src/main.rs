@@ -1,6 +1,7 @@
 use std::{
     io::{stdout, Write},
     process::ExitCode,
+    time::Duration,
 };
 
 use board::Board;
@@ -13,6 +14,7 @@ use termal::{
         events::{Event, KeyCode},
     },
 };
+use vec2::Vec2;
 
 mod board;
 mod board_gui;
@@ -51,12 +53,37 @@ fn start() -> Result<()> {
     out += codes::HIDE_CURSOR;
     print!("{}", out);
 
+    let mut size = terminal_size()?;
+
+    let mut redraw = true;
+
     loop {
         out.clear();
-        board.draw(&mut out, |s, x, y| *s += &termal::move_to!(x + 1, y + 1));
-        print!("{out}{}{msg}", codes::ERASE_TO_END);
-        _ = stdout().flush();
+        let new_size = terminal_size()?;
+        if new_size != size {
+            out += codes::ERASE_ALL;
+            out += codes::ERASE_SCREEN;
+            redraw = true;
+        }
+        size = new_size;
+
+        if redraw {
+            board.draw(
+                &mut out,
+                |s, Vec2 { x, y }| *s += &termal::move_to!(x + 1, y + 1),
+                size - (0, 1).into(),
+            );
+            print!("{out}{}{msg}", codes::ERASE_TO_END);
+            _ = stdout().flush();
+            redraw = false;
+        }
         msg.clear();
+
+        if !terminal.has_buffered_input()
+            && !raw::wait_for_stdin(Duration::from_millis(100))?
+        {
+            continue;
+        }
 
         let Event::KeyPress(key) = terminal.read()? else {
             continue;
@@ -110,8 +137,12 @@ fn start() -> Result<()> {
                     [h]help"
                 );
             }
-            _ => {}
+            _ => {
+                continue;
+            }
         }
+
+        redraw = true;
     }
 
     raw::disable_raw_mode()?;
@@ -122,4 +153,9 @@ fn start() -> Result<()> {
     );
 
     Ok(())
+}
+
+fn terminal_size() -> Result<Vec2> {
+    let size = raw::term_size()?;
+    Ok((size.char_width, size.char_height).into())
 }
