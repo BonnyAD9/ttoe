@@ -170,6 +170,11 @@ fn start() -> Result<()> {
                     persistant_msg.clear();
                 } else {
                     no_color = !no_color;
+                    if no_color {
+                        msg += "Colors disabled";
+                    } else {
+                        msg += "Colors enabled";
+                    }
                 }
             }
             KeyCode::Char('h') => {
