@@ -132,7 +132,7 @@ fn start() -> Result<()> {
             }
             KeyCode::Enter | KeyCode::Space | KeyCode::Char('0') => {
                 if let Err(e) = board.play() {
-                    msg += &formatc!("{'r}error: {'_}{e}");
+                    msg += &formatc!("{'r}{e}{'_}");
                 }
                 match board.check_win() {
                     None => {
