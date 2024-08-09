@@ -61,18 +61,34 @@ impl Board {
                 (-1, 1) => {
                     let mut pos = pos;
                     for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (1, 1).into());
+                        *out += &format!("{color},");
+                        move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                        *out += &format!("{color}'");
                         move_to(out, pos.cmul((4, 2)) + (0, 2).into());
                         *out += &format!("{color}/");
                         pos = pos.wrapping_add_signed(dir);
                     }
+                    move_to(out, pos.cmul((4, 2)) + (1, 1).into());
+                    *out += &format!("{color},");
+                    move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                    *out += &format!("{color}'");
                 }
                 (1, 1) => {
                     let mut pos = pos;
                     for _ in 1..self.win_len() {
+                        move_to(out, pos.cmul((4, 2)) + (1, 1).into());
+                        *out += &format!("{color}'");
+                        move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                        *out += &format!("{color},");
                         move_to(out, pos.cmul((4, 2)) + (4, 2).into());
                         *out += &format!("{color}\\");
                         pos = pos.wrapping_add_signed(dir);
                     }
+                    move_to(out, pos.cmul((4, 2)) + (1, 1).into());
+                    *out += &format!("{color}'");
+                    move_to(out, pos.cmul((4, 2)) + (3, 1).into());
+                    *out += &format!("{color},");
                 }
                 (0, 1) => {
                     let mut pos = pos;
