@@ -13,6 +13,7 @@ use termal::{
         self,
         events::{Event, KeyCode, Modifiers},
     },
+    term_text::TermText,
 };
 use vec2::Vec2;
 
@@ -50,6 +51,8 @@ fn start() -> Result<()> {
     let default_msg = formatc!("{'gr}Press [h] to show help.");
     let mut persistant_msg = String::new();
 
+    let mut no_color = false;
+
     out += codes::ENABLE_ALTERNATIVE_BUFFER;
     out += codes::ERASE_ALL;
     out += codes::ERASE_SCREEN;
@@ -78,10 +81,22 @@ fn start() -> Result<()> {
             board.draw(
                 &mut out,
                 |s, Vec2 { x, y }| *s += &termal::move_to!(x + 1, y + 1),
-                size - (0, 1).into(),
+                size,
                 msg,
             );
-            printc!("{out}");
+            if no_color {
+                let mut to_print = String::new();
+                for s in TermText::new(&out).spans().filter(|s| {
+                    !s.is_control()
+                        || s.text().ends_with('H')
+                        || s.text().ends_with('J')
+                }) {
+                    to_print += s.text();
+                }
+                printc!("{'_}{to_print}");
+            } else {
+                printc!("{'_}{out}");
+            }
             _ = stdout().flush();
             redraw = false;
         }
@@ -151,8 +166,11 @@ fn start() -> Result<()> {
             KeyCode::Char('c') => {
                 if key.modifiers.contains(Modifiers::CONTROL) {
                     break;
+                } else if key.modifiers.contains(Modifiers::SHIFT) {
+                    persistant_msg.clear();
+                } else {
+                    no_color = !no_color;
                 }
-                persistant_msg.clear();
             }
             KeyCode::Char('h') => {
                 persistant_msg.clear();
