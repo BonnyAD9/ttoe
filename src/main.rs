@@ -156,7 +156,7 @@ fn start() -> Result<()> {
             }
             KeyCode::Char('h') => {
                 persistant_msg.clear();
-                persistant_msg += "[wasd/↑←↓→]move [Enter/Space/0]play \
+                persistant_msg += "[Arrows/wasd]move [Enter/Space/0]play \
                 [q]quit [r]restart [u]undo [h]help";
             }
             _ => {
