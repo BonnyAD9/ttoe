@@ -1,24 +1,22 @@
-use std::{
-    io::{stdout, Write},
-    process::ExitCode,
-    time::Duration,
-};
+use std::{process::ExitCode, time::Duration};
 
 use board::Board;
+use draw_buffer::DrawBuffer;
 use err::Result;
 use suit::Suit;
 use termal::{
-    codes, eprintcln, formatc, printc,
+    codes, eprintcln, formatc,
     raw::{
         self,
         events::{Event, KeyCode, Modifiers},
     },
-    term_text::TermText,
 };
 use vec2::Vec2;
 
+mod append_str;
 mod board;
 mod board_gui;
+mod draw_buffer;
 mod err;
 mod suit;
 mod vec2;
@@ -45,7 +43,7 @@ fn start() -> Result<()> {
 
     let mut board = Board::new((20, 20));
     let mut terminal = raw::Terminal::new();
-    let mut out = String::new();
+    let mut out = DrawBuffer::new();
     let mut msg = String::new();
 
     let default_msg = formatc!("{'gr}Press [h] to show help.");
@@ -57,14 +55,13 @@ fn start() -> Result<()> {
     out += codes::ERASE_ALL;
     out += codes::ERASE_SCREEN;
     out += codes::HIDE_CURSOR;
-    print!("{}", out);
+    out.clear_commit();
 
     let mut size = terminal_size()?;
 
     let mut redraw = true;
 
     loop {
-        out.clear();
         let new_size = terminal_size()?;
         if new_size != size {
             out += codes::ERASE_ALL;
@@ -78,26 +75,13 @@ fn start() -> Result<()> {
                 .into_iter()
                 .find(|a| !a.is_empty())
                 .unwrap_or(&default_msg);
-            board.draw(
-                &mut out,
-                |s, Vec2 { x, y }| *s += &termal::move_to!(x + 1, y + 1),
-                size,
-                msg,
-            );
+            out.set_base((1, 1));
+            board.draw(&mut out, size, msg);
             if no_color {
-                let mut to_print = String::new();
-                for s in TermText::new(&out).spans().filter(|s| {
-                    !s.is_control()
-                        || s.text().ends_with('H')
-                        || s.text().ends_with('J')
-                }) {
-                    to_print += s.text();
-                }
-                printc!("{'_}{to_print}");
+                out.no_color_clear_commit();
             } else {
-                printc!("{'_}{out}");
+                out.clear_commit();
             }
-            _ = stdout().flush();
             redraw = false;
         }
         msg.clear();

@@ -6,7 +6,7 @@ use std::{
 
 use crate::vec2_range::Vec2Range;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
 pub struct Vec2<T = usize> {
     pub x: T,
     pub y: T,
