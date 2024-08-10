@@ -1,23 +1,16 @@
-use std::{process::ExitCode, time::Duration};
+use std::process::ExitCode;
 
 use board::Board;
-use draw_buffer::DrawBuffer;
 use err::Result;
-use suit::Suit;
-use termal::{
-    codes, eprintcln, formatc,
-    raw::{
-        self,
-        events::{Event, KeyCode, Modifiers},
-    },
-};
-use vec2::Vec2;
+use mainloop::Mainloop;
+use termal::eprintcln;
 
 mod append_str;
 mod board;
 mod board_gui;
 mod draw_buffer;
 mod err;
+mod mainloop;
 mod suit;
 mod vec2;
 mod vec2_range;
@@ -26,165 +19,18 @@ fn main() -> ExitCode {
     match start() {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
-            print!(
-                "{}{}",
-                codes::DISABLE_ALTERNATIVE_BUFFER,
-                codes::SHOW_CURSOR
-            );
+            _ = Mainloop::restore();
             eprintcln!("{'r}error: {e}");
-            _ = raw::disable_raw_mode();
             ExitCode::FAILURE
         }
     }
 }
 
 fn start() -> Result<()> {
-    raw::enable_raw_mode()?;
+    Mainloop::prepare()?;
 
-    let mut board = Board::new((20, 20));
-    let mut terminal = raw::Terminal::new();
-    let mut out = DrawBuffer::new();
-    let mut msg = String::new();
+    let mut mainloop = Mainloop::new(Board::new((15, 15)));
+    mainloop.run()?;
 
-    let default_msg = formatc!("{'gr}Press [h] to show help.");
-    let mut persistant_msg = String::new();
-
-    let mut no_color = false;
-
-    out += codes::ENABLE_ALTERNATIVE_BUFFER;
-    out += codes::ERASE_ALL;
-    out += codes::ERASE_SCREEN;
-    out += codes::HIDE_CURSOR;
-    out.clear_commit();
-
-    let mut size = terminal_size()?;
-
-    let mut redraw = true;
-
-    loop {
-        let new_size = terminal_size()?;
-        if new_size != size {
-            out += codes::ERASE_ALL;
-            out += codes::ERASE_SCREEN;
-            redraw = true;
-        }
-        size = new_size;
-
-        if redraw {
-            let msg = [msg.as_str(), &persistant_msg]
-                .into_iter()
-                .find(|a| !a.is_empty())
-                .unwrap_or(&default_msg);
-            out.set_base((1, 1));
-            board.draw(&mut out, size, msg);
-            if no_color {
-                out.no_color_clear_commit();
-            } else {
-                out.clear_commit();
-            }
-            redraw = false;
-        }
-        msg.clear();
-        if !persistant_msg.is_empty()
-            && !persistant_msg.starts_with(codes::ESC)
-        {
-            persistant_msg.insert_str(0, codes::GRAY_FG);
-        }
-
-        if !terminal.has_buffered_input()
-            && !raw::wait_for_stdin(Duration::from_millis(100))?
-        {
-            continue;
-        }
-
-        let Event::KeyPress(key) = terminal.read()? else {
-            continue;
-        };
-
-        match key.code {
-            KeyCode::Up | KeyCode::Char('w') => {
-                board.set_selected(board.selected().saturating_sub((0, 1)));
-            }
-            KeyCode::Left | KeyCode::Char('a') => {
-                board.set_selected(board.selected().saturating_sub((1, 0)));
-            }
-            KeyCode::Down | KeyCode::Char('s') => {
-                board.set_selected(board.selected() + (0, 1).into());
-            }
-            KeyCode::Right | KeyCode::Char('d') => {
-                board.set_selected(board.selected() + (1, 0).into());
-            }
-            KeyCode::Enter | KeyCode::Space | KeyCode::Char('0') => {
-                if let Err(e) = board.play() {
-                    msg += &formatc!("{'r}{e}{'_}");
-                }
-                match board.check_win() {
-                    None => {
-                        persistant_msg.clear();
-                        persistant_msg += &formatc!("{'_}Draw!");
-                        board.inspect_mode();
-                    }
-                    Some(Suit::Circle) => {
-                        persistant_msg.clear();
-                        persistant_msg += &formatc!("{'r}O {'_}Wins!\r");
-                        board.inspect_mode();
-                    }
-                    Some(Suit::Cross) => {
-                        persistant_msg.clear();
-                        persistant_msg += &formatc!("{'b}X {'_}Wins!\r");
-                        board.inspect_mode();
-                    }
-                    _ => {}
-                }
-            }
-            KeyCode::Char('u') => {
-                board.undo();
-            }
-            KeyCode::Char('r') => {
-                persistant_msg.clear();
-                board.reset();
-            }
-            KeyCode::Char('q') => {
-                break;
-            }
-            KeyCode::Char('c') => {
-                if key.modifiers.contains(Modifiers::CONTROL) {
-                    break;
-                } else if key.modifiers.contains(Modifiers::SHIFT) {
-                    persistant_msg.clear();
-                } else {
-                    no_color = !no_color;
-                    if no_color {
-                        msg += "Colors disabled";
-                    } else {
-                        msg += "Colors enabled";
-                    }
-                }
-            }
-            KeyCode::Char('h') => {
-                persistant_msg.clear();
-                persistant_msg += "[Arrows/wasd]move [Enter/Space/0]play \
-                [q]quit [r]restart [u]undo [h]help";
-            }
-            _ => {
-                continue;
-            }
-        }
-
-        redraw = true;
-    }
-
-    raw::disable_raw_mode()?;
-    print!(
-        "{}{}",
-        codes::DISABLE_ALTERNATIVE_BUFFER,
-        codes::SHOW_CURSOR
-    );
-
-    Ok(())
-}
-
-fn terminal_size() -> Result<Vec2> {
-    let size = raw::term_size()?;
-    Ok((size.char_width, size.char_height).into())
+    Mainloop::restore()
 }

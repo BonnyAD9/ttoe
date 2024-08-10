@@ -53,6 +53,17 @@ impl Vec2<usize> {
         }
     }
 
+    pub fn saturating_add_signed(
+        &mut self,
+        other: impl Into<Vec2<isize>>,
+    ) -> Self {
+        let Vec2 { x, y } = other.into();
+        Self {
+            x: self.x.saturating_add_signed(x),
+            y: self.y.saturating_add_signed(y),
+        }
+    }
+
     pub fn clamp(&self, min: impl Into<Self>, max: impl Into<Self>) -> Self {
         let Self { x: minx, y: miny } = min.into();
         let Self { x: maxx, y: maxy } = max.into();
