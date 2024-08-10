@@ -8,4 +8,6 @@ pub enum Error {
     AlreadyPopulated,
     #[error(transparent)]
     Termal(#[from] termal::error::Error),
+    #[error("Rage quit :)")]
+    RageQuit,
 }

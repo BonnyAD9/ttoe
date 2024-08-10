@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{io::{self, Write}, time::Duration};
 
 use termal::{
     codes, formatc, printc,
@@ -10,7 +10,7 @@ use termal::{
 };
 
 use crate::{
-    board::Board, draw_buffer::DrawBuffer, err::Result, suit::Suit, vec2::Vec2,
+    board::Board, draw_buffer::DrawBuffer, err::{Error, Result}, suit::Suit, vec2::Vec2,
 };
 
 const DEFAULT_MSG: &str = "\x1b[90mPress [h] to show help.";
@@ -44,11 +44,13 @@ impl Mainloop {
     pub fn prepare() -> Result<()> {
         raw::enable_raw_mode()?;
         printc!("{'abuf e _e_ nocur}");
+        _ = io::stdout().flush();
         Ok(())
     }
 
     pub fn restore() -> Result<()> {
         printc!("{'_abuf _nocur}");
+        _ = io::stdout().flush();
         raw::disable_raw_mode()?;
         Ok(())
     }
@@ -151,7 +153,7 @@ impl Mainloop {
             }
             KeyCode::Char('c') => {
                 if key.modifiers.contains(Modifiers::CONTROL) {
-                    return Ok(false);
+                    return Err(Error::RageQuit);
                 } else if key.modifiers.contains(Modifiers::SHIFT) {
                     self.persistant_msg.clear();
                 } else {

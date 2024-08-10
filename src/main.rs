@@ -20,7 +20,7 @@ fn main() -> ExitCode {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
             _ = Mainloop::restore();
-            eprintcln!("{'r}error: {e}");
+            eprintcln!("{'r}error: {'_}{e}");
             ExitCode::FAILURE
         }
     }
