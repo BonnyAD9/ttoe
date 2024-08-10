@@ -39,6 +39,20 @@ impl<T> Vec2<T> {
     pub fn tuple(self) -> (T, T) {
         (self.x, self.y)
     }
+
+    pub fn max(self) -> T
+    where
+        T: Ord,
+    {
+        std::cmp::max(self.x, self.y)
+    }
+
+    pub fn min(self) -> T
+    where
+        T: Ord,
+    {
+        std::cmp::min(self.x, self.y)
+    }
 }
 
 impl Vec2<usize> {

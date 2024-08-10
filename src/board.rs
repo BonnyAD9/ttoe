@@ -10,14 +10,14 @@ pub struct Board {
     board: Vec<Suit>,
     size: Vec2,
     on_turn: Suit,
-    win_length: usize,
+    win_len: usize,
     selected: Vec2,
     last: Vec2,
     win_pos: Option<(Vec2, Vec2<isize>)>,
 }
 
 impl Board {
-    pub fn new(size: impl Into<Vec2>) -> Self {
+    pub fn new(size: impl Into<Vec2>, win_len: usize) -> Self {
         let mut board = Vec::new();
         let size = size.into();
         board.resize_with(size.prod(), || Suit::None);
@@ -25,7 +25,7 @@ impl Board {
             board,
             size,
             on_turn: Suit::Cross,
-            win_length: 5,
+            win_len,
             selected: (size - (1, 1)) / 2,
             last: (0, 0).into(),
             win_pos: None,
@@ -57,7 +57,7 @@ impl Board {
     }
 
     pub fn win_len(&self) -> usize {
-        self.win_length
+        self.win_len
     }
 
     pub fn play(&mut self) -> Result<()> {
@@ -87,21 +87,20 @@ impl Board {
                 continue;
             }
 
-            if pos.y + self.win_length <= self.size.y {
-                if pos.x >= self.win_length && self.is_win(pos, (-1, 1)) {
+            if pos.y + self.win_len <= self.size.y {
+                if pos.x >= self.win_len && self.is_win(pos, (-1, 1)) {
                     return Some(suit);
                 }
                 if self.is_win(pos, (0, 1)) {
                     return Some(suit);
                 }
-                if pos.x + self.win_length <= self.size.x
+                if pos.x + self.win_len <= self.size.x
                     && self.is_win(pos, (1, 1))
                 {
                     return Some(suit);
                 }
             }
-            if pos.x + self.win_length <= self.size.x
-                && self.is_win(pos, (1, 0))
+            if pos.x + self.win_len <= self.size.x && self.is_win(pos, (1, 0))
             {
                 return Some(suit);
             }
@@ -136,7 +135,7 @@ impl Board {
         let pos1 = pos;
         let dir = dir.into();
         let suit = self[pos];
-        for _ in 0..self.win_length - 1 {
+        for _ in 0..self.win_len - 1 {
             pos = pos.wrapping_add_signed(dir);
             if self[pos] != suit {
                 return false;

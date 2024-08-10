@@ -23,8 +23,6 @@ impl Iterator for Vec2Range<usize> {
     type Item = Vec2;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.x += 1;
-
         if self.x >= self.end.x {
             if self.x == self.start.x {
                 return None;
@@ -37,6 +35,8 @@ impl Iterator for Vec2Range<usize> {
             return None;
         }
 
-        Some((self.x, self.start.y).into())
+        self.x += 1;
+
+        Some((self.x - 1, self.start.y).into())
     }
 }

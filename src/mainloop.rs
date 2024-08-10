@@ -35,14 +35,14 @@ pub struct Mainloop {
 }
 
 impl Mainloop {
-    pub fn new(board: Board) -> Self {
+    pub fn new(board: Board, color: bool) -> Self {
         Self {
             board,
             terminal: Terminal::new(),
             out: DrawBuffer::new(),
             msg: String::new(),
             persistant_msg: String::new(),
-            color: true,
+            color,
             redraw: true,
             size: (0, 0).into(),
         }

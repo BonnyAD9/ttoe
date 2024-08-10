@@ -33,6 +33,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "pareg"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0127fbd944bb7d344dff90d31a0cd787b7b9223c0c67b2f5376fbc0a65c9dbbd"
+dependencies = [
+ "pareg_core",
+ "pareg_proc",
+]
+
+[[package]]
+name = "pareg_core"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb96996e4c32ee6bc531dab7218a4cf1f9b08efb006a23f45686bcbaf0105980"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "thiserror",
+]
+
+[[package]]
+name = "pareg_proc"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c93fa493d946f87ab8aef2561d502980a6db9c8955a9b16e57477be7483fe9f"
+dependencies = [
+ "pareg_core",
+]
+
+[[package]]
 name = "place_macro"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -148,6 +179,7 @@ dependencies = [
 name = "ttoe"
 version = "0.1.0"
 dependencies = [
+ "pareg",
  "termal",
  "thiserror",
 ]
