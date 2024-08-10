@@ -36,6 +36,15 @@ impl<T> Vec2<T> {
         Vec2::new(self.x * x, self.y * y)
     }
 
+    pub fn cdiv<I, R>(self, rhs: I) -> Vec2<T::Output>
+    where
+        T: Div<R>,
+        I: Into<Vec2<R>>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        Vec2::new(self.x / x, self.y / y)
+    }
+
     pub fn tuple(self) -> (T, T) {
         (self.x, self.y)
     }

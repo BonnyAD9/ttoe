@@ -68,7 +68,7 @@ Version {v}
     Shows this help.
 
   {'y}-s  --size {'w}<width>x<height>{'_}
-    Set the board size. Default size is {'i}15x15{'_}.
+    Set the board size. Default size is largest that fits terminal.
 
   {'y}-w  --win  --win-length {'w}<win length>{'_}
     Set the number of same cells needed to win. The default is {'i}5{'_} or the

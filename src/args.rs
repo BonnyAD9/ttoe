@@ -1,6 +1,7 @@
 use std::io::{self, IsTerminal};
 
 use pareg::{ArgError, ArgIterator, ByRef};
+use termal::raw;
 
 use crate::{err::Result, vec2::Vec2};
 
@@ -39,6 +40,8 @@ impl Args {
         args.next();
 
         res.parse_self(args)?;
+
+        res.finalize();
         Ok(res)
     }
 
@@ -76,5 +79,18 @@ impl Args {
         }
 
         Ok(())
+    }
+
+    pub fn finalize(&mut self) {
+        if self.size.is_some() {
+            return;
+        }
+
+        let Ok(size) = raw::term_size() else {
+            return;
+        };
+
+        let size: Vec2 = (size.char_width, size.char_height).into();
+        self.size = Some((size - (1, 2)).cdiv((4, 2)));
     }
 }
