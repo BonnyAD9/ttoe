@@ -2,7 +2,7 @@ use std::{borrow::Cow, env, process::ExitCode};
 
 use args::Args;
 use board::Board;
-use err::Result;
+use err::{Error, Result};
 use mainloop::Mainloop;
 use termal::{eprintcln, gradient, printmcln};
 
@@ -20,6 +20,10 @@ mod vec2_range;
 fn main() -> ExitCode {
     match start() {
         Ok(_) => ExitCode::SUCCESS,
+        Err(e) if matches!(e, Error::Pareg(_)) => {
+            eprintcln!("{'r}error: {'_}{e}");
+            ExitCode::FAILURE
+        }
         Err(e) => {
             _ = Mainloop::restore();
             eprintcln!("{'r}error: {'_}{e}");
