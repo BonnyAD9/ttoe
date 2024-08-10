@@ -102,6 +102,8 @@ impl Mainloop {
         }
 
         self.msg.clear();
+
+        self.redraw = false;
     }
 
     fn update_msg(&mut self) {
