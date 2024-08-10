@@ -143,7 +143,7 @@ impl Board {
         match suit {
             Suit::Circle => (codes::RED_FG, 'o'),
             Suit::Cross => (codes::BLUE_FG, 'x'),
-            Suit::None => (codes::WHITE_FG, '+'),
+            Suit::None => (codes::WHITE_FG, '#'),
         }
     }
 }
