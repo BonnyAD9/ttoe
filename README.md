@@ -26,6 +26,9 @@ just type in your shell:
 ```sh
 # Download from github into folder 'ttoe':
 git clone https://github.com/BonnyAD9/ttoe.git
+# Checkout to the latest release (this is optional, but you may have buggy
+# version)
+git checkout `git describe --tag --abbrev=0`
 # Build ttoe:
 cd ttoe
 cargo build -r
