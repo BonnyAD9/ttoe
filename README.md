@@ -3,7 +3,7 @@ Tick Tack Toe in your terminal.
 
 ## How to use
 ```sh
-ttoe -s <width>x<height> -w <win-length>
+ttoe [-s <width>x<height>] [-w <win-length>]
 ```
 
 This will start a new game with the given board size and win length.
