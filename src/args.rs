@@ -77,10 +77,11 @@ impl Args {
                             msg: Some("The win length cannot be 0.".into()),
                         })?;
                     }
-                    self.win_len = Some(wl)
+                    self.win_len = Some(wl);
                 }
                 "--color" | "--colour" => {
-                    self.use_color = Some(args.next_bool("always", "never")?)
+                    self.use_color =
+                        args.next_opt_bool("always", "never", "auto")?;
                 }
                 _ => Err(ArgError::UnknownArgument(arg.to_owned().into()))?,
             }

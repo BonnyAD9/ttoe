@@ -65,7 +65,7 @@ impl<T> Vec2<T> {
 
     pub fn max(self, other: impl Into<Self>) -> Self
     where
-        T: Ord
+        T: Ord,
     {
         let Self { x, y } = other.into();
         (self.x.max(x), self.y.max(y)).into()
