@@ -49,18 +49,26 @@ impl<T> Vec2<T> {
         (self.x, self.y)
     }
 
-    pub fn max(self) -> T
+    pub fn cmax(self) -> T
     where
         T: Ord,
     {
         std::cmp::max(self.x, self.y)
     }
 
-    pub fn min(self) -> T
+    pub fn cmin(self) -> T
     where
         T: Ord,
     {
         std::cmp::min(self.x, self.y)
+    }
+
+    pub fn max(self, other: impl Into<Self>) -> Self
+    where
+        T: Ord
+    {
+        let Self { x, y } = other.into();
+        (self.x.max(x), self.y.max(y)).into()
     }
 }
 

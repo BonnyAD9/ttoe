@@ -1,5 +1,10 @@
 # Changelog
 
+## v?
+
+### Bugfixes
+- Don't allow auto size to be 0.
+
 ## v0.2.0
 
 ### Features

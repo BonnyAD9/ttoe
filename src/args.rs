@@ -23,7 +23,7 @@ impl Args {
     }
 
     pub fn win_len(&self) -> usize {
-        self.win_len.unwrap_or_else(|| self.size().max().min(5))
+        self.win_len.unwrap_or_else(|| self.size().cmax().min(5))
     }
 
     pub fn color(&self) -> bool {
@@ -59,7 +59,7 @@ impl Args {
                 "-s" | "--size" => {
                     let size: Vec2 =
                         args.next_key_val::<usize, usize>('x')?.into();
-                    if size.min() == 0 {
+                    if size.cmin() == 0 {
                         Err(ArgError::FailedToParse {
                             typ: "size",
                             value: args.cur_arg::<&str>()?.to_owned().into(),
@@ -99,6 +99,6 @@ impl Args {
         };
 
         let size: Vec2 = (size.char_width, size.char_height).into();
-        self.size = Some((size - (1, 2)).cdiv((4, 2)));
+        self.size = Some((size - (1, 2)).cdiv((4, 2)).max((1, 1)));
     }
 }
