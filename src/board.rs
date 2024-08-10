@@ -26,7 +26,7 @@ impl Board {
             size,
             on_turn: Suit::Cross,
             win_length: 5,
-            selected: (size - (1, 1).into()) / 2,
+            selected: (size - (1, 1)) / 2,
             last: (0, 0).into(),
             win_pos: None,
         }
@@ -49,7 +49,7 @@ impl Board {
     }
 
     pub fn set_selected(&mut self, selected: Vec2) {
-        self.selected = selected.clamp((0, 0), self.size - (1, 1).into());
+        self.selected = selected.clamp((0, 0), self.size - (1, 1));
     }
 
     pub fn win_pos(&self) -> Option<(Vec2, Vec2<isize>)> {
@@ -115,7 +115,7 @@ impl Board {
             *v = Suit::None;
         }
         self.on_turn = Suit::Cross;
-        self.selected = (self.size - (1, 1).into()) / 2;
+        self.selected = (self.size - (1, 1)) / 2;
         self.win_pos = None;
     }
 

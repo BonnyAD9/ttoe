@@ -1,4 +1,7 @@
-use std::{io::{self, Write}, time::Duration};
+use std::{
+    io::{self, Write},
+    time::Duration,
+};
 
 use termal::{
     codes, formatc, printc,
@@ -10,7 +13,11 @@ use termal::{
 };
 
 use crate::{
-    board::Board, draw_buffer::DrawBuffer, err::{Error, Result}, suit::Suit, vec2::Vec2,
+    board::Board,
+    draw_buffer::DrawBuffer,
+    err::{Error, Result},
+    suit::Suit,
+    vec2::Vec2,
 };
 
 const DEFAULT_MSG: &str = "\x1b[90mPress [h] to show help.";

@@ -168,6 +168,48 @@ where
     }
 }
 
+impl<L, R> Add<(R, R)> for Vec2<L>
+where
+    L: Add<R>,
+{
+    type Output = Vec2<L::Output>;
+
+    fn add(self, rhs: (R, R)) -> Self::Output {
+        Vec2::new(self.x + rhs.0, self.y + rhs.1)
+    }
+}
+
+impl<L, R> AddAssign<(R, R)> for Vec2<L>
+where
+    L: AddAssign<R>,
+{
+    fn add_assign(&mut self, rhs: (R, R)) {
+        self.x += rhs.0;
+        self.y += rhs.1;
+    }
+}
+
+impl<L, R> Sub<(R, R)> for Vec2<L>
+where
+    L: Sub<R>,
+{
+    type Output = Vec2<L::Output>;
+
+    fn sub(self, rhs: (R, R)) -> Self::Output {
+        Vec2::new(self.x - rhs.0, self.y - rhs.1)
+    }
+}
+
+impl<L, R> SubAssign<(R, R)> for Vec2<L>
+where
+    L: SubAssign<R>,
+{
+    fn sub_assign(&mut self, rhs: (R, R)) {
+        self.x -= rhs.0;
+        self.y -= rhs.1;
+    }
+}
+
 impl<T> Neg for Vec2<T>
 where
     T: Neg,

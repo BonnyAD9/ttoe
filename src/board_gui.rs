@@ -4,7 +4,7 @@ use crate::{board::Board, draw_buffer::DrawBuffer, suit::Suit, vec2::Vec2};
 
 impl Board {
     pub fn draw(&self, out: &mut DrawBuffer, space: Vec2, msg: &str) {
-        let draw_size = self.size().cmul((4, 2)) + (1, 2).into();
+        let draw_size = self.size().cmul((4, 2)) + (1, 2);
         if draw_size.gt_or(space) {
             Self::draw_no_space(out, space);
             return;
@@ -27,7 +27,7 @@ impl Board {
         let center = Self::center(space, (msg.len(), 1));
         out.move_to(center);
         *out += formatc!("{'r bold}{msg}");
-        out.move_to(center + (0, 1).into());
+        out.move_to(center + (0, 1));
     }
 
     fn draw_msg(
@@ -45,13 +45,13 @@ impl Board {
         out.move_to((0, base.y + draw_size.y));
         *out += codes::ERASE_TO_END;
         out.move_to((msgx, base.y + draw_size.y));
-        *out += &formatc!("{'_}{msg}");
+        *out += formatc!("{'_}{msg}");
 
         base
     }
 
     fn draw_grid(&self, out: &mut DrawBuffer) {
-        *out += &formatc!("{'_ gr}");
+        *out += formatc!("{'_ gr}");
         for y in 0..self.size().y {
             out.move_to((0, y * 2));
             out.repeat(self.size().x, "+---");
@@ -103,7 +103,7 @@ impl Board {
         *out += color;
 
         for i in (0..self.win_len()).rev() {
-            out.move_to(pos.cmul((4, 2)) + (1, 1).into());
+            out.move_to(pos.cmul((4, 2)) + (1, 1));
             *out += formatc!("{pre}{'mr}{post}");
             if i != 0 {
                 out.move_to(pos.cmul((4, 2)) + line_offset);
@@ -114,24 +114,23 @@ impl Board {
     }
 
     fn draw_selected(&self, out: &mut DrawBuffer) {
-        let x = self.selected().x * 4;
-        let y = self.selected().y * 2;
+        let pos = self.selected().cmul((4, 2));
 
-        out.move_to((x, y));
+        out.move_to(pos);
         let (color, chr) = Self::get_color_char(self.on_turn());
 
         *out += format!("{color}{chr}---{chr}");
-        out.move_to((x, y + 1));
+        out.move_to(pos + (0, 1));
         *out += formatc!("|{'mr mr mr}|");
-        out.move_to((x, y + 2));
-        *out += &format!("{chr}---{chr}");
+        out.move_to(pos + (0, 2));
+        *out += format!("{chr}---{chr}");
     }
 
     fn draw_suit(out: &mut DrawBuffer, suit: Suit) {
         match suit {
             Suit::None => *out += " ",
-            Suit::Cross => *out += &formatc!("{'b}X"),
-            Suit::Circle => *out += &formatc!("{'r}O"),
+            Suit::Cross => *out += formatc!("{'b}X"),
+            Suit::Circle => *out += formatc!("{'r}O"),
         }
     }
 
