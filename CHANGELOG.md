@@ -1,6 +1,6 @@
 # Changelog
 
-## v?
+## v0.2.1
 
 ### Bugfixes
 - Don't allow auto size to be 0.
