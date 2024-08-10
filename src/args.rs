@@ -61,15 +61,23 @@ impl Args {
                         args.next_key_val::<usize, usize>('x')?.into();
                     if size.min() == 0 {
                         Err(ArgError::FailedToParse {
-                            typ: "Vec2",
+                            typ: "size",
                             value: args.cur_arg::<&str>()?.to_owned().into(),
-                            msg: Some("The size must not be 0".into()),
+                            msg: Some("The size must not be 0.".into()),
                         })?;
                     }
                     self.size = Some(size);
                 }
                 "-w" | "--win" | "--win-length" => {
-                    self.win_len = Some(args.next_arg()?)
+                    let wl = args.next_arg()?;
+                    if wl == 0 {
+                        Err(ArgError::FailedToParse {
+                            typ: "length",
+                            value: args.cur_arg::<&str>()?.to_owned().into(),
+                            msg: Some("The win length cannot be 0.".into()),
+                        })?;
+                    }
+                    self.win_len = Some(wl)
                 }
                 "--color" | "--colour" => {
                     self.use_color = Some(args.next_bool("always", "never")?)
