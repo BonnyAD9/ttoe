@@ -12,7 +12,7 @@ pub struct Vec2<T = usize> {
 }
 
 impl<T> Vec2<T> {
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
@@ -23,6 +23,33 @@ impl<T> Vec2<T> {
     {
         let Vec2 { x, y } = rhs.into();
         self.x > x || self.y > y
+    }
+
+    pub fn ge_and<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x >= x && self.y >= y
+    }
+
+    pub fn lt_or<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x < x || self.y < y
+    }
+
+    pub fn lt_and<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x < x && self.y < y
     }
 
     pub fn ge_or<I, R>(&self, rhs: I) -> bool
@@ -77,6 +104,14 @@ impl<T> Vec2<T> {
         let Self { x, y } = other.into();
         (self.x.max(x), self.y.max(y)).into()
     }
+
+    pub fn cmin(self, other: impl Into<Self>) -> Self
+    where
+        T: Ord,
+    {
+        let Self { x, y } = other.into();
+        (self.x.min(x), self.y.min(y)).into()
+    }
 }
 
 impl Vec2<usize> {
@@ -118,6 +153,16 @@ impl Vec2<usize> {
 
     pub fn to(self, other: Vec2) -> Vec2Range<usize> {
         Vec2Range::new(self, other)
+    }
+
+    pub fn signed(self) -> Vec2<isize> {
+        (self.x as isize, self.y as isize).into()
+    }
+}
+
+impl Vec2<isize> {
+    pub fn unsigned(self) -> Vec2 {
+        (self.x as usize, self.y as usize).into()
     }
 }
 

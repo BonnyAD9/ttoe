@@ -14,6 +14,7 @@ use termal::{
 
 use crate::{
     board::Board,
+    board_gui::GuiState,
     draw_buffer::DrawBuffer,
     err::{Error, Result},
     suit::Suit,
@@ -32,6 +33,7 @@ pub struct Mainloop {
     color: bool,
     redraw: bool,
     size: Vec2,
+    gui_state: GuiState,
 }
 
 impl Mainloop {
@@ -45,6 +47,7 @@ impl Mainloop {
             color,
             redraw: true,
             size: (0, 0).into(),
+            gui_state: GuiState::default(),
         }
     }
 
@@ -102,7 +105,8 @@ impl Mainloop {
             .unwrap_or(DEFAULT_MSG);
 
         self.out.set_base((1, 1));
-        self.board.draw(&mut self.out, self.size, msg);
+        self.board
+            .draw(&mut self.gui_state, &mut self.out, self.size, msg);
 
         if self.color {
             self.out.clear_commit();
@@ -167,6 +171,7 @@ impl Mainloop {
                     self.toggle_color();
                 } else {
                     self.board.set_selected((self.board.size() - (1, 1)) / 2);
+                    self.gui_state.center();
                 }
             }
             KeyCode::Char('h') => {
@@ -184,6 +189,8 @@ impl Mainloop {
     fn move_dir(&mut self, dir: impl Into<Vec2<isize>>, m: Modifiers) {
         if m.contains(Modifiers::SHIFT) {
             self.shift_move(dir);
+        } else if m.contains(Modifiers::CONTROL) {
+            self.gui_state.scroll_by(dir);
         } else {
             self.move_by(dir);
         }

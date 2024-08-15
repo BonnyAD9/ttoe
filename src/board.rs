@@ -1,7 +1,8 @@
-use std::ops::{Index, IndexMut};
+use std::ops::{Index, IndexMut, RangeBounds};
 
 use crate::{
     err::{Error, Result},
+    slice_2d::Slice2d,
     suit::Suit,
     vec2::Vec2,
 };
@@ -123,6 +124,22 @@ impl Board {
             self[last] = Suit::None;
             self.on_turn = self.on_turn.oposite();
         }
+    }
+
+    pub fn slice(&self, range: impl RangeBounds<Vec2>) -> Slice2d<'_, Suit> {
+        let start = match range.start_bound() {
+            std::ops::Bound::Included(s) => *s,
+            std::ops::Bound::Excluded(s) => *s + (1, 1),
+            std::ops::Bound::Unbounded => (0, 0).into(),
+        };
+
+        let end = match range.end_bound() {
+            std::ops::Bound::Included(e) => *e + (1, 1),
+            std::ops::Bound::Excluded(e) => *e,
+            std::ops::Bound::Unbounded => self.size(),
+        };
+
+        Slice2d::new(&self.board, self.size, start, end - start)
     }
 
     fn is_win(

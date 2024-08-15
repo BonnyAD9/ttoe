@@ -13,6 +13,7 @@ mod board_gui;
 mod draw_buffer;
 mod err;
 mod mainloop;
+mod slice_2d;
 mod suit;
 mod vec2;
 mod vec2_range;
@@ -103,6 +104,9 @@ Version {v}
 
   {'b}[c]{'_}
     Move cursor to the center of the board.
+
+  {'b}[Ctrl+Arrows/Ctrl+wasd]{'_}
+    Scroll (when the board doesn't fit the terminal).
 
   {'b}[Alt+c]{'_}
     Toggle color.

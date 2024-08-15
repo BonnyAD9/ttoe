@@ -5,6 +5,7 @@
 ### Features
 - Move to the first empty space after non empty space.
 - Move to the center.
+- Allow scrolling when board doesn't fit.
 
 ### Changes
 - Don't move to the center on reset.
