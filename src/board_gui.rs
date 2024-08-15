@@ -143,6 +143,9 @@ impl Board {
         let base = Self::center(space, draw_size);
 
         let msg_len = TermText::new(msg).display_char_cnt();
+        if space.x < msg_len {
+            return;
+        }
         let msgx = Self::center(space, (msg_len, 0)).x;
 
         out.move_to((0, base.y + draw_size.y));
