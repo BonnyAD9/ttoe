@@ -1,5 +1,4 @@
 use std::{
-    cmp::Ordering,
     fmt::Display,
     ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Neg, Sub, SubAssign},
 };
@@ -23,8 +22,16 @@ impl<T> Vec2<T> {
         T: PartialOrd<R>,
     {
         let Vec2 { x, y } = rhs.into();
-        self.x.partial_cmp(&x) == Some(Ordering::Greater)
-            || self.y.partial_cmp(&y) == Some(Ordering::Greater)
+        self.x > x || self.y > y
+    }
+
+    pub fn ge_or<I, R>(&self, rhs: I) -> bool
+    where
+        I: Into<Vec2<R>>,
+        T: PartialOrd<R>,
+    {
+        let Vec2 { x, y } = rhs.into();
+        self.x >= x || self.y >= y
     }
 
     pub fn cmul<I, R>(self, rhs: I) -> Vec2<T::Output>

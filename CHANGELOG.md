@@ -1,5 +1,14 @@
 # Changelog
 
+## v?
+
+### Features
+- Move to the first empty space after non empty space.
+- Move to the center.
+
+### Changes
+- Don't move to the center on reset.
+
 ## v0.2.1
 
 ### Bugfixes

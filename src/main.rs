@@ -83,10 +83,10 @@ Version {v}
 
 {'g}In game controls:
   {'b}[Arrows/wasd]{'_}
-    Move the selected cell.
+    Move the selected cell (cursor).
 
   {'b}[Enter/Space/0]{'_}
-    Play at the selected cell.
+    Play at the selected cell (cursor).
 
   {'b}[u]{'_}
     Undo last turn. This can undo only 1 last turn.
@@ -96,6 +96,13 @@ Version {v}
 
   {'b}[q]{'_}
     Quit
+
+  {'b}[Shift+Arrows/WASD]{'_}
+    Move the cursor in the given direction to the first empty space after
+    occupated space.
+
+  {'b}[Alt+c]{'_}
+    Move cursor to the center of the board.
 
   {'b}[c]{'_}
     Toggle color.

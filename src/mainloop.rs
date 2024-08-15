@@ -135,16 +135,16 @@ impl Mainloop {
 
         match key.code {
             KeyCode::Up | KeyCode::Char('w') => {
-                self.move_by((0, -1));
+                self.move_dir((0, -1), key.modifiers);
             }
             KeyCode::Left | KeyCode::Char('a') => {
-                self.move_by((-1, 0));
+                self.move_dir((-1, 0), key.modifiers);
             }
             KeyCode::Down | KeyCode::Char('s') => {
-                self.move_by((0, 1));
+                self.move_dir((0, 1), key.modifiers);
             }
             KeyCode::Right | KeyCode::Char('d') => {
-                self.move_by((1, 0));
+                self.move_dir((1, 0), key.modifiers);
             }
             KeyCode::Enter | KeyCode::Space | KeyCode::Char('0') => {
                 self.play();
@@ -163,6 +163,8 @@ impl Mainloop {
                     return Err(Error::RageQuit);
                 } else if key.modifiers.contains(Modifiers::SHIFT) {
                     self.persistant_msg.clear();
+                } else if key.modifiers.contains(Modifiers::ALT) {
+                    self.board.set_selected((self.board.size() - (1, 1)) / 2);
                 } else {
                     self.toggle_color();
                 }
@@ -179,10 +181,45 @@ impl Mainloop {
         Ok(true)
     }
 
+    fn move_dir(&mut self, dir: impl Into<Vec2<isize>>, m: Modifiers) {
+        if m.contains(Modifiers::SHIFT) {
+            self.shift_move(dir);
+        } else {
+            self.move_by(dir);
+        }
+    }
+
     fn move_by(&mut self, dif: impl Into<Vec2<isize>>) {
         self.board.set_selected(
             self.board.selected().saturating_add_signed(dif.into()),
         );
+    }
+
+    fn shift_move(&mut self, dir: impl Into<Vec2<isize>>) {
+        let mut pos = self.board.selected();
+        let dir = dir.into();
+
+        // Move to the first populated space
+        self.shift_move_inner(&mut pos, dir, true);
+        // Move to the first unpopulated space
+        self.shift_move_inner(&mut pos, dir, false);
+
+        self.board.set_selected(pos);
+    }
+
+    fn shift_move_inner(
+        &mut self,
+        pos: &mut Vec2<usize>,
+        dir: Vec2<isize>,
+        empty: bool,
+    ) {
+        while self.board[*pos].is_none() == empty {
+            let new_pos = pos.saturating_add_signed(dir);
+            if new_pos == *pos || new_pos.ge_or(self.board.size()) {
+                break;
+            }
+            *pos = new_pos;
+        }
     }
 
     fn play(&mut self) {

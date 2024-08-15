@@ -114,7 +114,6 @@ impl Board {
             *v = Suit::None;
         }
         self.on_turn = Suit::Cross;
-        self.selected = (self.size - (1, 1)) / 2;
         self.win_pos = None;
     }
 
