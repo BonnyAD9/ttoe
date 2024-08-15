@@ -101,10 +101,10 @@ Version {v}
     Move the cursor in the given direction to the first empty space after
     occupated space.
 
-  {'b}[Alt+c]{'_}
+  {'b}[c]{'_}
     Move cursor to the center of the board.
 
-  {'b}[c]{'_}
+  {'b}[Alt+c]{'_}
     Toggle color.
 
   {'b}[C]{'_}

@@ -164,9 +164,9 @@ impl Mainloop {
                 } else if key.modifiers.contains(Modifiers::SHIFT) {
                     self.persistant_msg.clear();
                 } else if key.modifiers.contains(Modifiers::ALT) {
-                    self.board.set_selected((self.board.size() - (1, 1)) / 2);
-                } else {
                     self.toggle_color();
+                } else {
+                    self.board.set_selected((self.board.size() - (1, 1)) / 2);
                 }
             }
             KeyCode::Char('h') => {

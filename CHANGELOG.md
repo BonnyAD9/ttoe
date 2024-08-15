@@ -8,6 +8,7 @@
 
 ### Changes
 - Don't move to the center on reset.
+- Toggle color on `Alt+c` instead of just `c`.
 
 ## v0.2.1
 
