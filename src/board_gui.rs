@@ -50,6 +50,8 @@ const DR_CROSS: WinCrossPath = WinCrossPath::new('\'', ',', '\\', (4, 2));
 const D_CROSS: WinCrossPath = WinCrossPath::new(' ', ' ', '|', (2, 2));
 const R_CROSS: WinCrossPath = WinCrossPath::new('-', '-', '-', (4, 1));
 
+const SCROLLOFF: Vec2 = Vec2::new(2, 2);
+
 impl Board {
     pub fn draw(
         &self,
@@ -103,9 +105,11 @@ impl Board {
             .view_pos
             .unwrap_or_else(|| Self::center(self.size(), view_size));
 
-        let bot_right = (view_pos.cmin(self.selected()) + view_size)
+        let bot_right = (view_pos
+            .cmin(self.selected().saturating_sub(SCROLLOFF))
+            + view_size)
             .cmin(self.size())
-            .cmax(self.selected() + (1, 1));
+            .cmax((self.selected() + (1, 1) + SCROLLOFF).cmin(self.size()));
         let top_left = bot_right - view_size;
 
         Self::draw_msg(out, space, view_size.cmul((4, 2)) + (4, 3), msg);
