@@ -17,6 +17,7 @@ mod slice_2d;
 mod suit;
 mod vec2;
 mod vec2_range;
+mod bot;
 
 fn main() -> ExitCode {
     match start() {

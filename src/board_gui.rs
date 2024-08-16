@@ -257,7 +257,7 @@ impl Board {
 
     fn draw_selected(&self, gui: &mut GuiState, out: &mut DrawBuffer) {
         let pos =
-            (self.selected() - gui.view_pos.unwrap_or_default()).cmul((4, 2));
+            (self.selected().saturating_sub(gui.view_pos.unwrap_or_default())).cmul((4, 2));
 
         out.move_to(pos);
         let (color, chr) = Self::get_color_char(self.on_turn());

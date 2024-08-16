@@ -5,7 +5,7 @@ use std::{
 
 use crate::vec2_range::Vec2Range;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default, Hash)]
 pub struct Vec2<T = usize> {
     pub x: T,
     pub y: T,
@@ -126,8 +126,9 @@ impl Vec2<usize> {
         }
     }
 
+    #[must_use]
     pub fn saturating_add_signed(
-        &mut self,
+        self,
         other: impl Into<Vec2<isize>>,
     ) -> Self {
         let Vec2 { x, y } = other.into();
@@ -157,6 +158,30 @@ impl Vec2<usize> {
 
     pub fn signed(self) -> Vec2<isize> {
         (self.x as isize, self.y as isize).into()
+    }
+
+    pub fn mod_size(mut self, other: Self) -> Self {
+        if self.x >= other.x {
+            self.x -= other.x;
+            self.y += 1;
+        }
+        if self.y >= other.y {
+            self.y -= other.y;
+        }
+        self
+    }
+
+    pub fn surround(self) -> impl Iterator<Item = Vec2> {
+        [
+            self.saturating_add_signed((-1, -1)),
+            self.saturating_add_signed((0, -1)),
+            self.saturating_add_signed((1, -1)),
+            self.saturating_add_signed((-1, 0)),
+            self + (1, 0),
+            self.saturating_add_signed((-1, 1)),
+            self + (0, 1),
+            self + (1, 1),
+        ].into_iter()
     }
 }
 
@@ -322,5 +347,11 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "[{}, {}]", self.x, self.y)
+    }
+}
+
+impl PartialEq<(usize, usize)> for Vec2 {
+    fn eq(&self, other: &(usize, usize)) -> bool {
+        self.tuple() == *other
     }
 }

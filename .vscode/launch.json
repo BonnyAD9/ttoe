@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-s", "20x20"],
+            "args": ["-s", "15x15"],
             "cwd": "${workspaceFolder}"
         },
         {

@@ -17,6 +17,11 @@ impl<T> Vec2Range<T> {
             end,
         }
     }
+
+    pub fn contains(&self, other: impl Into<Vec2<T>>) -> bool where T: Ord {
+        let Vec2 { x, y } = other.into();
+        x >= self.start.x && x < self.end.x && y >= self.start.y && y < self.end.y
+    }
 }
 
 impl Iterator for Vec2Range<usize> {

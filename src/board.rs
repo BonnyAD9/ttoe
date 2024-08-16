@@ -7,6 +7,7 @@ use crate::{
     vec2::Vec2,
 };
 
+#[derive(Clone)]
 pub struct Board {
     board: Vec<Suit>,
     size: Vec2,
@@ -89,7 +90,7 @@ impl Board {
             }
 
             if pos.y + self.win_len <= self.size.y {
-                if pos.x >= self.win_len && self.is_win(pos, (-1, 1)) {
+                if pos.x + 1 >= self.win_len && self.is_win(pos, (-1, 1)) {
                     return Some(suit);
                 }
                 if self.is_win(pos, (0, 1)) {
@@ -107,7 +108,7 @@ impl Board {
             }
         }
 
-        (!draw).then_some(Suit::None)
+        draw.then_some(Suit::None)
     }
 
     pub fn reset(&mut self) {
@@ -142,6 +143,14 @@ impl Board {
         Slice2d::new(&self.board, self.size, start, end - start)
     }
 
+    pub fn last_play(&self) -> Option<Vec2> {
+        if self[self.last].is_none() {
+            None
+        } else {
+            Some(self.last)
+        }
+    }
+
     fn is_win(
         &mut self,
         pos: impl Into<Vec2<usize>>,
@@ -159,6 +168,10 @@ impl Board {
         }
         self.win_pos = Some((pos1, dir));
         true
+    }
+
+    pub fn swap_turn(&mut self) {
+        self.on_turn = self.on_turn.oposite();
     }
 }
 

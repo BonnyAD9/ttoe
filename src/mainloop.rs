@@ -13,12 +13,7 @@ use termal::{
 };
 
 use crate::{
-    board::Board,
-    board_gui::GuiState,
-    draw_buffer::DrawBuffer,
-    err::{Error, Result},
-    suit::Suit,
-    vec2::Vec2,
+    board::Board, board_gui::GuiState, bot::{self, Bot}, draw_buffer::DrawBuffer, err::{Error, Result}, suit::Suit, vec2::Vec2
 };
 
 const DEFAULT_MSG: &str = "\x1b[90mPress [h] to show help.";
@@ -34,6 +29,8 @@ pub struct Mainloop {
     redraw: bool,
     size: Vec2,
     gui_state: GuiState,
+    player_x: Option<Box<dyn Bot>>,
+    player_o: Option<Box<dyn Bot>>,
 }
 
 impl Mainloop {
@@ -48,6 +45,8 @@ impl Mainloop {
             redraw: true,
             size: (0, 0).into(),
             gui_state: GuiState::default(),
+            player_x: Some(Box::new(bot::Brute::new(5, 7))),
+            player_o: None,
         }
     }
 
@@ -73,6 +72,10 @@ impl Mainloop {
         }
 
         self.update_msg();
+
+        if self.play_bot() {
+            self.draw();
+        }
 
         if !self.has_input()? {
             return Ok(true);
@@ -117,6 +120,34 @@ impl Mainloop {
         self.msg.clear();
 
         self.redraw = false;
+    }
+
+    fn play_bot(&mut self) -> bool {
+        match self.board.on_turn() {
+            Suit::None => false,
+            Suit::Cross => {
+                if let Some(b) = self.player_x.as_mut() {
+                    let last = self.board.last_play();
+                    let pos = b.play(&mut self.board, last);
+                    self.board.set_selected(pos);
+                    self.play();
+                    true
+                } else {
+                    false
+                }
+            },
+            Suit::Circle => {
+                if let Some(b) = self.player_o.as_mut() {
+                    let last = self.board.last_play();
+                    let pos = b.play(&mut self.board, last);
+                    self.board.set_selected(pos);
+                    self.play();
+                    true
+                } else {
+                    false
+                }
+            },
+        }
     }
 
     fn update_msg(&mut self) {
@@ -234,7 +265,7 @@ impl Mainloop {
             self.msg += &formatc!("{'r}{e}{'_}");
         }
         match self.board.check_win() {
-            None => {
+            Some(Suit::None) => {
                 self.set_persistant_msg(formatc!("{'_}Draw!"));
             }
             Some(Suit::Circle) => {
